@@ -1,0 +1,28 @@
+# Ignore everything by default, selectively add things to context
+*
+
+# Classic - AutoGPT
+!classic/original_autogpt/autogpt/
+!classic/original_autogpt/pyproject.toml
+!classic/original_autogpt/poetry.lock
+!classic/original_autogpt/README.md
+!classic/original_autogpt/tests/
+
+# Classic - Benchmark
+!classic/benchmark/agbenchmark/
+!classic/benchmark/pyproject.toml
+!classic/benchmark/poetry.lock
+!classic/benchmark/README.md
+
+# Classic - Forge
+!classic/forge/
+!classic/forge/pyproject.toml
+!classic/forge/poetry.lock
+!classic/forge/README.md
+
+# Classic - Frontend
+!classic/frontend/build/web/
+
+# Explicitly re-ignore some folders
+.*
+**/__pycache__

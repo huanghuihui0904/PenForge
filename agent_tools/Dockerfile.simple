@@ -1,0 +1,16 @@
+FROM debian:bookworm-slim
+
+WORKDIR /app/
+
+RUN apt-get update && apt-get install -y \
+    wget unzip curl ca-certificates && \
+    wget https://github.com/epi052/feroxbuster/releases/download/v2.10.0/x86_64-linux-feroxbuster.zip && \
+    unzip x86_64-linux-feroxbuster.zip && \
+    mv feroxbuster /usr/local/bin/feroxbuster && \
+    chmod +x /usr/local/bin/feroxbuster && \
+    rm x86_64-linux-feroxbuster.zip
+
+COPY api-endpoints.txt /app/api-endpoints.txt
+COPY common.txt /app/common.txt
+
+CMD ["sleep", "infinity"]

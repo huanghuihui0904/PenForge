@@ -1,0 +1,99 @@
+FROM kalilinux/kali-rolling
+
+WORKDIR /app/
+
+RUN apt-get update && apt-get install -y \
+    git curl wget gnupg ca-certificates \
+    build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev \
+    libncursesw5-dev xz-utils tk-dev libxml2-dev \
+    libxmlsec1-dev libffi-dev liblzma-dev
+
+RUN curl -O https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz && \
+    tar -xvf Python-3.11.9.tgz && cd Python-3.11.9 && \
+    ./configure --enable-optimizations && \
+    make -j$(nproc) && make altinstall && \
+    cd .. && rm -rf Python-3.11.9 Python-3.11.9.tgz
+
+RUN ln -sf /usr/local/bin/python3.11 /usr/bin/python && \
+    ln -sf /usr/local/bin/pip3.11 /usr/bin/pip
+
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+
+RUN pip install requests \
+ && apt-get update && apt-get install -y git curl wget gnupg ca-certificates sudo iputils-ping netcat-openbsd
+
+# --- Minimal extra install to satisfy agent logs (only added one small block) ---
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nmap \
+    gobuster \
+    dirb \
+    sqlmap \
+    wpscan \
+    hping3 \
+    slowhttptest \
+    ffuf \
+    apache2-utils \
+    ruby-full \
+    netcat-openbsd \
+    dnsutils \
+    jq \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y wget unzip curl git ca-certificates && \
+    wget https://github.com/epi052/feroxbuster/releases/download/v2.10.0/x86_64-linux-feroxbuster.zip && \
+    unzip x86_64-linux-feroxbuster.zip && \
+    mv feroxbuster /usr/local/bin/feroxbuster && \
+    chmod +x /usr/local/bin/feroxbuster && \
+    rm x86_64-linux-feroxbuster.zip
+
+RUN apt-get install -y apache2-utils
+
+RUN wget https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64 -O /usr/local/bin/hey && \
+    chmod +x /usr/local/bin/hey
+
+RUN pip install slowloris
+
+RUN pip install --no-cache-dir poetry
+RUN apt-get install -y ffuf || echo "Skipping ffuf if not available"
+
+RUN echo "deb http://http.kali.org/kali kali-rolling main contrib non-free non-free-firmware" > /etc/apt/sources.list
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    chromium-driver \
+    libnss3 \
+    libxss1 \
+    libasound2t64 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    xdg-utils \
+    ca-certificates \
+    fonts-liberation \
+    wget \
+    curl \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY api-endpoints.txt /app/api-endpoints.txt
+COPY common.txt /app/common.txt
+
+COPY check_password.py /app/check_password.py
+
+COPY . /app/
+
+WORKDIR /app/classic/original_autogpt
+
+RUN chmod +x run_task-meta_planner.sh
+
+CMD ./run_task-meta_planner.sh $CVE $DIFFICULTY $MODEL $EXPERT_AGENT_SCRIPT_PATH
