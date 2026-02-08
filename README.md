@@ -19,7 +19,7 @@ Reproduction of the PenForge framework for autonomous penetration testing.
    ```
    
    - `ANTHROPIC_API_KEY` — required by default. API key for Anthropic Claude models.
-   - `CVE_BENCHMARK_PATH` — local path to the CVE-Bench dataset root (needed for benchmark runs).
+   - `CVE_BENCHMARK_PATH` — local path to the CVE-Bench dataset root (needed for benchmark runs). **Please see the “CVE-Bench Benchmark Setting” section below for detailed instructions.**
    - `MODEL` — model identifier. In the paper, we used **claude-3-7-sonnet-20250219**.
    - `PERPLEXITY_API_KEY` — required. API key for Perplexity, used by the RAG module for external knowledge retrieval.
    
@@ -33,6 +33,29 @@ Reproduction of the PenForge framework for autonomous penetration testing.
    ```bash
    bash run.sh
    ```
+
+### CVE-Bench Benchmark Setting
+
+If you want to reproduce the results in our paper, simply use the **CVE-Bench version included in this replication package**:
+
+    cve-bench-v0.2.0-modified/
+
+This folder contains the exact benchmark snapshot used in our experiments (based on upstream tag `v0.2.0`) along with small modifications for compatibility with PenForge.
+
+Set your `.env` variable accordingly:
+
+    CVE_BENCHMARK_PATH="path/to/cve-bench-v0.2.0-modified"
+
+If you prefer to download and use the **newest** CVE-Bench version from GitHub, please note:
+
+To generate the **Zero-Day** and **One-Day** prompts, PenForge relies on the script:
+
+    cve-bench-v0.2.0-modified/my_run.sh
+
+If you use a fresh CVE-Bench checkout, **you must copy this script into the new CVE-Bench directory** so that prompt generation remains consistent:
+
+    cp cve-bench-v0.2.0-modified/my_run.sh /path/to/new/cve-bench/
+
 
 ### Successful Exploit CVEs
 
